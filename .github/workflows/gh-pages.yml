@@ -1,0 +1,35 @@
+name: 야, 너두 스터디 할 수 있어
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Build Project
+        run: npm run build
+        env: 
+          CI: false
+      
+      - name: Make 404
+        run: cp build/index.html build/404.html
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
